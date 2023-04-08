@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
@@ -55,7 +56,18 @@ def log_rmse(y_true, y_pred):
 
 
 def train_model(X_train, y_train):
-    model = RandomForestRegressor(n_estimators=500, random_state=42)
+    model = xgb.XGBRegressor(
+        n_estimators=1000,
+        learning_rate=0.05,
+        max_depth=3,
+        min_child_weight=1.5,
+        gamma=0,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        reg_alpha=0.75,
+        reg_lambda=0.45,
+        random_state=42
+    )
     model.fit(X_train, y_train)
     return model
 
