@@ -4,8 +4,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.linear_model import Lasso
-from sklearn.metrics import mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from sklearn.model_selection import train_test_split
 
 
@@ -48,16 +48,22 @@ def preprocess_data(train_data, test_data):
     return X_train_preprocessed, y_train, X_test_preprocessed
 
 
+def log_rmse(y_true, y_pred):
+    log_y_true = np.log(y_true + 1)
+    log_y_pred = np.log(y_pred + 1)
+    return np.sqrt(mean_squared_error(log_y_true, log_y_pred))
+
+
 def train_model(X_train, y_train):
-    model = Lasso(alpha=0.0005, random_state=42)
+    model = RandomForestRegressor(n_estimators=500, random_state=42)
     model.fit(X_train, y_train)
     return model
 
 
 def validate_model(model, X_val, y_val):
     y_pred = model.predict(X_val)
-    mse = mean_squared_error(y_val, y_pred)
-    print(f"Mean Squared Error: {mse}")
+    log_rmse_score = log_rmse(y_val, y_pred)
+    print(f"Log RMSE: {log_rmse_score}")
 
 
 def create_submission_file(model, X_test, test_data, file_name='submission.csv'):
