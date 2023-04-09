@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
@@ -84,6 +85,13 @@ def create_submission_file(model, X_test, test_data, file_name='submission.csv')
     submission.to_csv(file_name, index=False)
     print(f"Submission file saved as {file_name}")
 
+def visualize_fit(model, X_train, y_train):
+    y_train_pred = model.predict(X_train)
+    plt.scatter(y_train, y_train_pred, alpha=0.5)
+    plt.xlabel("True Values")
+    plt.ylabel("Predicted Values")
+    plt.title("True Values vs Predicted Values")
+    plt.show()
 
 def main():
     train_data, test_data = load_data('data/train.csv', 'data/test.csv')
@@ -95,6 +103,8 @@ def main():
     model = train_model(X_train_split, y_train_split)
 
     validate_model(model, X_val_split, y_val_split)
+
+    visualize_fit(model, X_train_split, y_train_split)
 
     create_submission_file(model, X_test_preprocessed, test_data)
 
